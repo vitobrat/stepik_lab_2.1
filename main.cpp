@@ -4,7 +4,7 @@
 #include <locale>
 #include <windows.h>
 const std::string fileName = "C:\\FirstCursProgramm\\C++\\stepik_lab_2.1\\StudentList.txt";
-//оценки по предметам - АиГ, Матан, Прога, Инфа, Англ, Философия, Физика, Курсовая
+std::vector<std::string> listOfSubject = {"Алгебра и Геометрия - ", "Математический анализ - ", "Программирование - ", "Информатика - ", "Английский язык - ", "Философия - ", "Физика - ", "Курсовая - "};
 using namespace std;
 
 struct Student{
@@ -15,6 +15,43 @@ struct Student{
     int groupId;
     int marks[8];
 };
+
+int checkInput(){
+    int input;
+    try {
+        cin >> input;
+        if (cin.fail()) {
+            throw 1;
+        }
+    } catch (int exeption) {
+        cout << "ERROR!!!";
+        exit(0);
+    }
+    cin.sync();
+    cout << "\n";
+    return input;
+}
+
+void refreshStudentListId(vector<Student> &listOfStudent){
+    for(int i = 0; i < listOfStudent.size(); i++){
+        listOfStudent[i].id = i+1;
+    }
+}
+
+void refreshStudentList(vector<Student> &listOfStudent){
+    refreshStudentListId(listOfStudent);
+    ofstream file(fileName, ios::trunc);
+    for (int i = 0; i < listOfStudent.size(); i++){
+        string stringMarks;
+        for(int j = 0; j < 8; j++){
+            stringMarks += to_string(listOfStudent[i].marks[j]);
+        }
+        string newLine = to_string(listOfStudent[i].id) + "|" + listOfStudent[i].fullName + "|" + listOfStudent[i].sex + "|" + to_string(listOfStudent[i].group)  + "|" +
+                         to_string(listOfStudent[i].groupId) + "|" + stringMarks;
+        file << newLine << endl;
+    }
+    file.close();
+}
 
 void readDataBase(vector<Student> &listOfStudent){
     ifstream inputFile(fileName);
@@ -75,47 +112,56 @@ void readDataBase(vector<Student> &listOfStudent){
         inputFile.close();
     }
     else {
-        cout << "Unable to open file" << "\n";
+        cout << "Невозможно открыть файл!!!" << "\n";
     }
+}
+
+void printStudent(vector<Student> &listOfStudent, int i){
+    cout << "Id: " << listOfStudent[i].id<< "\n";
+    cout << "ФИО: " << listOfStudent[i].fullName<< "\n";
+    cout << "Пол: " << listOfStudent[i].sex<< "\n";
+    cout << "Группа: " << listOfStudent[i].group<< "\n";
+    cout << "Номер в группе: " << listOfStudent[i].groupId<< "\n";
+    cout << "Оценки:" << "\n";
+    cout << listOfSubject[0] << listOfStudent[i].marks[0]<< "\n";
+    cout << listOfSubject[1] << listOfStudent[i].marks[1]<< "\n";
+    cout << listOfSubject[2] << listOfStudent[i].marks[2]<< "\n";
+    cout << listOfSubject[3] << listOfStudent[i].marks[3]<< "\n";
+    cout << listOfSubject[4] << listOfStudent[i].marks[4]<< "\n";
+    cout << listOfSubject[5] << listOfStudent[i].marks[5]<< "\n";
+    cout << listOfSubject[6] << listOfStudent[i].marks[6]<< "\n";
+    cout << listOfSubject[7]<< listOfStudent[i].marks[7]<< "\n";
+    cout << "___" << "\n";
 }
 
 void printDataBase(vector<Student> &listOfStudent){
     cout << "Student list:" << "\n";
     for (int i = 0; i < listOfStudent.size(); i++){
-        cout << "Id: " << listOfStudent[i].id<< "\n";
-        cout << "Full name: " << listOfStudent[i].fullName<< "\n";
-        cout << "Sex: " << listOfStudent[i].sex<< "\n";
-        cout << "Group: " << listOfStudent[i].group<< "\n";
-        cout << "Group id: " << listOfStudent[i].groupId<< "\n";
-        cout << "Marks:" << "\n";
-        cout << "Алгебра и Геометрия - " << listOfStudent[i].marks[0]<< "\n";
-        cout << "Математический анализ - " << listOfStudent[i].marks[1]<< "\n";
-        cout << " - " << listOfStudent[i].marks[2]<< "\n";
-        cout << " - " << listOfStudent[i].marks[3]<< "\n";
-        cout << " - " << listOfStudent[i].marks[4]<< "\n";
-        cout << " - " << listOfStudent[i].marks[5]<< "\n";
-        cout << " - " << listOfStudent[i].marks[6]<< "\n";
-        cout << " - " << listOfStudent[i].marks[7]<< "\n";
-        cout << "___" << "\n";
+        printStudent(listOfStudent, i);
     }
 }
 
 void addStudent(vector<Student> &listOfStudent){
     Student student;
     student.id = listOfStudent[listOfStudent.size() - 1].id + 1;
-    cout << "Full name: ";
+    cout << "ФИО: ";
     getline(cin, student.fullName);
     cin.clear();
-    cout << "Sex (М/Ж): ";
+    cout << "Пол (М/Ж): ";
     cin >> student.sex;
+    if (student.sex.size() != 1){
+        cout << "Неправильный формат ввода";
+        return;
+    }
     cin.clear();
-    cout << "Group: ";
+    cout << "Группа: ";
     cin >> student.group;
-    cout << "Group id: ";
+    cout << "Номер в группе: ";
     cin >> student.groupId;
-    cout << "Term grades: ";
+    cout << "Оценки: ";
     string stringMarks;
     for (int i = 0; i < 8; i++) {
+        cout << listOfSubject[i];
         cin >> student.marks[i];
         stringMarks += to_string(student.marks[i]);
         if (!(student.marks[i] >= 3 && student.marks[i] <= 5)){
@@ -126,7 +172,6 @@ void addStudent(vector<Student> &listOfStudent){
     cin.clear();
     ofstream file(fileName, std::ios::app);
     if (file.is_open()) {
-        file << "\n";
         string newLine = to_string(student.id) + "|" + student.fullName + "|" + student.sex + "|" + to_string(student.group)  + "|" +
                 to_string(student.groupId) + "|" + stringMarks;
         file << newLine << endl;
@@ -137,15 +182,163 @@ void addStudent(vector<Student> &listOfStudent){
     listOfStudent.push_back(student);
 }
 
+void changeStudent(vector<Student> &listOfStudent){
+    cout << "Студента с каким id вы хотите изменить?\n";
+    int input = checkInput();
+    if (!(input>=1 && input <= listOfStudent.size())){
+        cout << "Ученика с таким id не существует!";
+        return;
+    }
+    Student student;
+    student.id = listOfStudent[input].id;
+    cout << "ФИО: ";
+    getline(cin, student.fullName);
+    cin.clear();
+    cout << "Пол (М/Ж): ";
+    cin >> student.sex;
+    if (student.sex.size() != 1){
+        cout << "Неправильный формат ввода";
+        return;
+    }
+    cin.clear();
+    cout << "Группа: ";
+    cin >> student.group;
+    cout << "Номер в группе: ";
+    cin >> student.groupId;
+    cout << "Оценки: ";
+    string stringMarks;
+    for (int i = 0; i < 8; i++) {
+        cout << listOfSubject[i];
+        cin >> student.marks[i];
+        stringMarks += to_string(student.marks[i]);
+        if (!(student.marks[i] >= 3 && student.marks[i] <= 5)){
+            cout << "Неправильный формат оценок";
+            return;
+        }
+    }
+    cin.clear();
+    listOfStudent[input-1] = student;
+    refreshStudentList(listOfStudent);
+}
+
+void printStudentFromGroup(vector<Student> &listOfStudent, int groupNumber){
+    cout << "Ученик(и) из группы №" << groupNumber << ":\n";
+    for (int i = 0; i < listOfStudent.size(); i++){
+        if(listOfStudent[i].group == groupNumber){
+            cout << listOfStudent[i].fullName << "\n";
+        }
+    }
+}
+
+void printStudentFromGroupId(vector<Student> &listOfStudent, int groupIdNumber){
+    cout << "Ученик(и) с номером" << groupIdNumber << ": \n";
+    for (int i = 0; i < listOfStudent.size(); i++){
+        if(listOfStudent[i].groupId == groupIdNumber){
+            printStudent(listOfStudent, i);
+        }
+    }
+}
+
+void countMaleAndFemale(vector<Student> &listOfStudent){
+    int countOfMale = 0;
+    for(int i = 0; i < listOfStudent.size(); i++){
+        if (listOfStudent[i].sex == "М") countOfMale++;
+    }
+    cout << "Количество студентов мужского пола: " << countOfMale << "\n";
+    cout <<"Количество студентов женского пола: " << listOfStudent.size() - countOfMale;
+}
+
+void gradeOfStudent(vector<Student> &listOfStudent){
+    vector<int> badMarks;
+    vector<int> goodMarks;
+    vector<int> excellentMarks;
+    for (int i = 0; i < listOfStudent.size(); i++){
+        int count3 = 0, count4 = 0;
+        for (int j = 0; j < 8; j++){
+            if(listOfStudent[i].marks[j] == 3) count3++;
+            if(listOfStudent[i].marks[j] == 4) count4++;
+        }
+        if(count3 == 0){
+            if (count4 == 0){
+                excellentMarks.push_back(i);
+            }else goodMarks.push_back(i);
+        }else badMarks.push_back(i);
+    }
+    cout << "Список данных студентов, которые не получают стипендию\n";
+    for(int i = 0; i < badMarks.size(); i++){
+        printStudent(listOfStudent, badMarks[i]);
+    }
+    cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+    cout << "Список студентов, которые получают стипендию\n";
+    for(int i = 0; i < goodMarks.size(); i++){
+        printStudent(listOfStudent, goodMarks[i]);
+    }
+    cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+    cout << "Список студентов, которые получают повышенную стипендию\n";
+    for(int i = 0; i < excellentMarks.size(); i++){
+        printStudent(listOfStudent, excellentMarks[i]);
+    }
+}
+
 int main() {
     setlocale(LC_ALL, "ru");
     vector<Student> listOfStudent;
     readDataBase(listOfStudent);
-    printDataBase(listOfStudent);
-    addStudent(listOfStudent);
-    printDataBase(listOfStudent);
-    getchar();
-    getchar();
-    getchar();
+    while(true){
+        cout << "Выберете действие:" << "\n";
+        cout << "Создать новую запись о студенте(1)"<< "\n";
+        cout << "Внести изменения в уже имеющуюся запись(2)"<< "\n";
+        cout << "Вывести все данные о студентах(3)"<< "\n";
+        cout << "Вывести информацию обо всех студентах группы N(4)"<< "\n";
+        cout << "Вывести топ самых успешных студентов с наивысшим по рейтингу средним баллом за прошедшую сессию(5)"<< "\n";
+        cout << "Вывести количество студентов мужского и женского пола(6)"<< "\n";
+        cout << "Вывести данные о студентах, которые не получают стипендию; учатся только на \"хорошо\" и \"отлично\"; учатся только на \"отлично\"(7)"<< "\n";
+        cout << "Вывести данные о студентах, имеющих номер в списке K(8)"<< "\n";
+        cout << "Обновить id(9)"<< "\n";
+        cout << "Выход(10)" << "\n";
+        int groupNumber, groupIdNumber;
+        int input = checkInput();
+        system("cls");
+        switch (input) {
+            case 1:
+                addStudent(listOfStudent);
+                break;
+            case 2:
+                changeStudent(listOfStudent);
+                break;
+            case 3:
+                printDataBase(listOfStudent);
+                break;
+            case 4:
+                cout << "Студентов какой группы вывести?";
+                groupNumber = checkInput();
+                printStudentFromGroup(listOfStudent, groupNumber);
+                break;
+            case 5:
+
+                break;
+            case 6:
+                countMaleAndFemale(listOfStudent);
+                break;
+            case 7:
+                gradeOfStudent(listOfStudent);
+                break;
+            case 8:
+                cout << "Студентов какого номера в своей группе вывести?";
+                groupIdNumber = checkInput();
+                printStudentFromGroupId(listOfStudent, groupIdNumber);
+                break;
+            case 9:
+                refreshStudentList(listOfStudent);
+                break;
+            case 10:
+                exit(1);
+            default:
+                cout << "Неправильный ввод данных!";
+                break;
+        }
+        getchar();
+        system("cls");
+    }
     return 0;
 }
