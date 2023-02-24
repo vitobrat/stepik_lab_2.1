@@ -3,6 +3,8 @@
 #include <fstream>
 #include <locale>
 #include <windows.h>
+#include <map>
+#include <algorithm>
 const std::string fileName = "C:\\FirstCursProgramm\\C++\\stepik_lab_2.1\\StudentList.txt";
 std::vector<std::string> listOfSubject = {"Алгебра и Геометрия - ", "Математический анализ - ", "Программирование - ", "Информатика - ", "Английский язык - ", "Философия - ", "Физика - ", "Курсовая - "};
 using namespace std;
@@ -269,14 +271,50 @@ void gradeOfStudent(vector<Student> &listOfStudent){
         printStudent(listOfStudent, badMarks[i]);
     }
     cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
-    cout << "Список студентов, которые получают стипендию\n";
+    cout << "Список данных студентов, которые получают стипендию\n";
     for(int i = 0; i < goodMarks.size(); i++){
         printStudent(listOfStudent, goodMarks[i]);
     }
     cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
-    cout << "Список студентов, которые получают повышенную стипендию\n";
+    cout << "Список данных студентов, которые получают повышенную стипендию\n";
     for(int i = 0; i < excellentMarks.size(); i++){
         printStudent(listOfStudent, excellentMarks[i]);
+    }
+}
+
+bool compareGrades(const pair<string, float>& a, const pair<string, float>& b){
+    return a.second > b.second;
+}
+
+float calculateAverageGrade(vector<Student> &listOfStudent, float i){
+    float sum;
+    for (int j = 0; j <= 7; j++){
+        sum += listOfStudent[i].marks[j];
+    }
+    return sum/8;
+}
+
+void printTop(vector<Student> &listOfStudent){
+    map <string, float> mapStudent;
+    for(int i = 0; i < listOfStudent.size(); i++){
+        float average = calculateAverageGrade(listOfStudent, i);
+        mapStudent[listOfStudent[i].fullName] = average;
+    }
+
+    // создаем вектор пар значений (ключ-значение)
+    vector<pair<string, float>> pairs;
+    for (const auto& pair : mapStudent) {
+        pairs.push_back(pair);
+    }
+
+    // сортируем вектор по значению
+    sort(pairs.begin(), pairs.end(), compareGrades);
+
+    // выводим отсортированные значения
+    cout << "Топ учеников:\n";
+    for (int i = 1; const auto& pair : pairs) {
+        cout << i << " " << pair.first << " : " << pair.second << endl;
+        i++;
     }
 }
 
@@ -310,12 +348,12 @@ int main() {
                 printDataBase(listOfStudent);
                 break;
             case 4:
-                cout << "Студентов какой группы вывести?";
+                cout << "Студентов какой группы вывести?\n";
                 groupNumber = checkInput();
                 printStudentFromGroup(listOfStudent, groupNumber);
                 break;
             case 5:
-
+                printTop(listOfStudent);
                 break;
             case 6:
                 countMaleAndFemale(listOfStudent);
@@ -324,7 +362,7 @@ int main() {
                 gradeOfStudent(listOfStudent);
                 break;
             case 8:
-                cout << "Студентов какого номера в своей группе вывести?";
+                cout << "Студентов какого номера в своей группе вывести?\n";
                 groupIdNumber = checkInput();
                 printStudentFromGroupId(listOfStudent, groupIdNumber);
                 break;
