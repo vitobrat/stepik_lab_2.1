@@ -227,7 +227,7 @@ void printStudentFromGroup(vector<Student> &listOfStudent, int groupNumber){
     cout << "Ученик(и) из группы №" << groupNumber << ":\n";
     for (int i = 0; i < listOfStudent.size(); i++){
         if(listOfStudent[i].group == groupNumber){
-            cout << listOfStudent[i].fullName << "\n";
+            printStudent(listOfStudent, i);
         }
     }
 }
