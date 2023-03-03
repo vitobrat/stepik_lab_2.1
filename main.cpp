@@ -143,35 +143,48 @@ void printDataBase(vector<Student> &listOfStudent){
     }
 }
 
-void addStudent(vector<Student> &listOfStudent){
-    Student student;
-    student.id = listOfStudent[listOfStudent.size() - 1].id + 1;
+void makeStudent(Student &student, string &stringMarks){
     cout << "ФИО: ";
     getline(cin, student.fullName);
     cin.clear();
     cout << "Пол (М/Ж): ";
     cin >> student.sex;
-    if (student.sex.size() != 1){
-        cout << "Неправильный формат ввода";
-        return;
+    while (!(student.sex == "М" || student.sex == "Ж")){
+        cout << "Неправильный ввод данных!\nПол (М/Ж): ";
+        cin >> student.sex;
     }
     cin.clear();
     cout << "Группа: ";
     cin >> student.group;
+    while (!(student.group >= 2000 && student.group <= 2999)){
+        cout << "Неправильный ввод данных!\nГруппа: ";
+        cin >> student.group;
+    }
     cout << "Номер в группе: ";
     cin >> student.groupId;
+    while (!(student.groupId >= 1 && student.groupId <= 30)){
+        cout << "Неправильный ввод данных!\nНомер в группе: ";
+        cin >> student.groupId;
+    }
     cout << "Оценки: ";
-    string stringMarks;
     for (int i = 0; i < 8; i++) {
         cout << listOfSubject[i];
         cin >> student.marks[i];
         stringMarks += to_string(student.marks[i]);
         if (!(student.marks[i] >= 3 && student.marks[i] <= 5)){
-            cout << "Неправильный формат оценок";
-            return;
+            cout << "Неправильный формат оценок\n";
+            i--;
+            stringMarks.erase(stringMarks.size() - 1);
         }
     }
     cin.clear();
+}
+
+void addStudent(vector<Student> &listOfStudent){
+    Student student;
+    string stringMarks;
+    student.id = listOfStudent[listOfStudent.size() - 1].id + 1;
+    makeStudent(student, stringMarks);
     ofstream file(fileName, std::ios::app);
     if (file.is_open()) {
         string newLine = to_string(student.id) + "|" + student.fullName + "|" + student.sex + "|" + to_string(student.group)  + "|" +
@@ -192,33 +205,9 @@ void changeStudent(vector<Student> &listOfStudent){
         return;
     }
     Student student;
-    student.id = listOfStudent[input].id;
-    cout << "ФИО: ";
-    getline(cin, student.fullName);
-    cin.clear();
-    cout << "Пол (М/Ж): ";
-    cin >> student.sex;
-    if (student.sex.size() != 1){
-        cout << "Неправильный формат ввода";
-        return;
-    }
-    cin.clear();
-    cout << "Группа: ";
-    cin >> student.group;
-    cout << "Номер в группе: ";
-    cin >> student.groupId;
-    cout << "Оценки: ";
     string stringMarks;
-    for (int i = 0; i < 8; i++) {
-        cout << listOfSubject[i];
-        cin >> student.marks[i];
-        stringMarks += to_string(student.marks[i]);
-        if (!(student.marks[i] >= 3 && student.marks[i] <= 5)){
-            cout << "Неправильный формат оценок";
-            return;
-        }
-    }
-    cin.clear();
+    student.id = listOfStudent[input].id;
+    makeStudent(student, stringMarks);
     listOfStudent[input-1] = student;
     refreshStudentList(listOfStudent);
 }
